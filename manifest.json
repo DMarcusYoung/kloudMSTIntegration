@@ -1,0 +1,65 @@
+{
+    "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.7/MicrosoftTeams.schema.json",
+    "manifestVersion": "1.7",
+    "version": "1.0.0",
+    "id": "758bb218-c046-43f1-809b-a627157f0d90",
+    "packageName": "com.kloud.devapp",
+    "developer": {
+        "name": "Kloud",
+        "websiteUrl": "https://kloud.com",
+        "privacyUrl": "https://techexcel.com/privacy-statement/",
+        "termsOfUseUrl": "https://techexcel.com/privacy-statement/"
+    },
+    "icons": {
+        "color": "color.png",
+        "outline": "outline.png"
+    },
+    "name": {
+        "short": "Kloud",
+        "full": "Kloud App For Microsoft Teams"
+    },
+    "description": {
+        "short": "App to increase productivity through Kloud solutions",
+        "full": "Kloud solutions app that provides document video sharing, and sync rooms in addition to video chats."
+    },
+    "accentColor": "#235EA5",
+    "composeExtensions": [
+        {
+            "botId": "758bb218-c046-43f1-809b-a627157f0d90",
+            "canUpdateConfiguration": true,
+            "commands": [
+                {
+                    "id": "Open",
+                    "type": "action",
+                    "title": "Open",
+                    "description": "Opens Kloud Website",
+                    "initialRun": true,
+                    "fetchTask": false,
+                    "context": [
+                        "commandBox",
+                        "compose"
+                    ],
+                    "parameters": [
+                        {
+                            "name": "Test Parameter",
+                            "title": "Test Parameter",
+                            "description": "test",
+                            "inputType": "text"
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "permissions": [
+        "identity",
+        "messageTeamMembers"
+    ],
+    "validDomains": [
+        "kloud.com"
+    ],
+    "devicePermissions": [
+        "media",
+        "openExternal"
+    ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "kloud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "dependencies": {
+    "botbuilder": "^4.9.2",
+    "botbuilder-teams": "^0.2.9",
+    "request": "^2.88.2",
+    "restify": "^8.5.1",
+    "util": "^0.12.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
