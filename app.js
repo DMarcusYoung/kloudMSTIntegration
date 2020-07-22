@@ -1,3 +1,6 @@
+// This is only the server code. The manifest.json has the info on how the app should behave on teams,
+// Local tunneling hosted by ngrok, app studio on MST has important configuation settings   
+
 var restify = require('restify');
 var builder = require('botbuilder');
 var util = require("util");
@@ -32,14 +35,24 @@ adapter.onTurnError = async (context, error) => {
 
 class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
     handleTeamsMessagingExtensionSubmitAction(context, action) {
-        const data = action.data;
-        // const heroCard = CardFactory.media(['Kloud.com']);
-        // console.log(heroCard.contentType)
-        // const attachment = { contentType: heroCard.contentType, content: heroCard, preview: heroCard };
-        const heroCard = CardFactory.heroCard(data.title, 'Kloud.com', [], [{
+        switch(action.commandId){
+            case 'startMeeting':
+                return startMeeting(context, action)
+            case 'syncRoom':
+                return syncRoom(context, action)
+            default: 
+                throw new Error('Not Implemented')
+        }
+        
+    }
+}
+
+function startMeeting(context, action){
+    const data = action.data;
+        const heroCard = CardFactory.heroCard(data.title, '', [], [{
             "type": "openUrl",
-            "title": "Go To website",
-            "value": "https://kloud.com"
+            "title": "Start Meeting",
+            "value": "kloud.cn/kloud/documents"
           },]);
         heroCard.content.subtitle = data.subTitle;
         const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
@@ -53,7 +66,27 @@ class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
                 ]
             }
         }
-    }
+}
+
+function syncRoom(context, action){
+    const data = action.data;
+        const heroCard = CardFactory.heroCard(data.title, '', [], [{
+            "type": "openUrl",
+            "title": "Go To Sync Rooms",
+            "value": "kloud.cn/kloud/syncroom"
+          },]);
+        heroCard.content.subtitle = data.subTitle;
+        const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
+
+        return {
+            composeExtension: {
+                type: 'result',
+                attachmentLayout: 'list',
+                attachments: [
+                attachment
+                ]
+            }
+        }
 }
 
 const bot = new TeamsMessagingExtensionsActionBot();
@@ -62,6 +95,7 @@ const server = restify.createServer();
 server.listen(3978, function () {
     console.log('%s listening to %s', server.name, util.inspect(server.address()));
 });
+
 // var inMemoryStorage = new builder.MemoryBotStorage();
 // var bot = new builder.UniversalBot(connector).set('storage', inMemoryStorage);
 

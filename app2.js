@@ -1,4 +1,4 @@
-// This File is currently just a reference to a deprecated tutorial
+// This file is currently just a reference to a deprecated tutorial, see app.js for server code
 
 var request = require('request');
 var util = require("util");
