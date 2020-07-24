@@ -1,6 +1,5 @@
 // This is only the server code. The manifest.json has the info on how the app should behave on teams,
 // Local tunneling hosted by ngrok, app studio on MST has important configuation settings   
-
 var restify = require('restify');
 var builder = require('botbuilder');
 var util = require("util");
@@ -70,22 +69,20 @@ function startMeeting(context, action){
 
 function syncRoom(context, action){
     const syncRoomList = [
-        { name: 'Room 1' },
-        { name: 'Room 2' },
-        { name: 'Room 3' },
+        { name: 'Room 1', url: 'https://kloud.com' },
+        { name: 'Room 2', url: 'https://us.kloud.com/join' },
+        { name: 'Room 3', url: 'https://us.kloud.com/register' },
     ]
-    const choices = [];
-    syncRoomList.forEach(el => choices.push({ title: el.name, value: el.name }))
+    // const choices = [];
+    // syncRoomList.forEach(el => choices.push({ title: el.name, value: el.name }))
+    const actions = [];
+    syncRoomList.forEach(el => actions.push({ title: el.name, type: 'Action.OpenUrl', url: el.url }))
     const adaptiveCard = CardFactory.adaptiveCard({
-        actions: [{
-          title: 'Open Sync Room',
-          type: "Action.OpenUrl",
-          url: 'https://kloud.com/'
-        }],
-        body: [
-          { text: 'Sync Rooms', type: 'TextBlock', weight: 'bolder'},
-          { choices, id: 'MultiSelect', style: 'expanded', type: 'Input.ChoiceSet' },
-        ],
+        actions,
+        // body: [
+        //   { text: 'Sync Rooms', type: 'TextBlock', weight: 'bolder'},
+        //   { choices, id: 'MultiSelect', style: 'expanded', type: 'Input.ChoiceSet' },
+        // ],
         type: 'AdaptiveCard',
         version: '1.0'
       });
@@ -105,20 +102,20 @@ function syncRoom(context, action){
 }
 
 const bot = new TeamsMessagingExtensionsActionBot();
-const inMemoryStorage = new builder.MemoryBotStorage();
-const chatBot = new builder.UniversalBot(adapter).set('storage', inMemoryStorage);
+// const inMemoryStorage = new builder.MemoryBotStorage();
+// const chatBot = new builder.UniversalBot(adapter).set('storage', inMemoryStorage);
 
-var stripBotAtMentions = new teams.StripBotAtMentions();
-chatBot.use(stripBotAtMentions);
+// var stripBotAtMentions = new teams.StripBotAtMentions();
+// chatBot.use(stripBotAtMentions);
 
-chatBot.dialog('/', [
-    function (session) {
-        builder.Prompts.text(session, 'Hi! What is your name?');
-    },
-    function (session, results) {
-        session.endDialog(`Hello ${results.response}!`);
-    }
-]);
+// chatBot.dialog('/', [
+//     function (session) {
+//         builder.Prompts.text(session, 'Hi! What is your name?');
+//     },
+//     function (session, results) {
+//         session.endDialog(`Hello ${results.response}!`);
+//     }
+// ]);
 
 const server = restify.createServer();
 server.listen(3978, function () {
