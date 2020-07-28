@@ -117,6 +117,116 @@ const bot = new TeamsMessagingExtensionsActionBot();
 //     }
 // ]);
 
+class TeamsConversationBot extends TeamsActivityHandler {
+    constructor() {
+        super();
+        this.onMessage(async (context, next) => {
+            TurnContext.removeRecipientMention(context.activity);
+            const text = context.activity.text.trim().toLocaleLowerCase();
+            if (text.includes('start')) {
+                await this.startActivityAsync(context);
+            } else if (text.includes('join')) {
+                await this.joinActivityAsync(context, true);
+            } else if (text.includes('help')) {
+                await this.helpActivityAsync(context);
+            } else if (text.includes('logout')) {
+                await this.logoutActivityAsync(context);
+            } else {
+                await this.cardActivityAsync(context, false);
+            }
+        });
+    }
+
+    async cardActivityAsync(context, isUpdate) {
+        const cardActions = [
+            {
+                type: ActionTypes.MessageBack,
+                title: 'Message all members',
+                value: null,
+                text: 'MessageAllMembers'
+            },
+            {
+                type: ActionTypes.MessageBack,
+                title: 'Who am I?',
+                value: null,
+                text: 'whoami'
+            },
+            {
+                type: ActionTypes.MessageBack,
+                title: 'Delete card',
+                value: null,
+                text: 'Delete'
+            }
+        ];
+
+        if (isUpdate) {
+            await this.sendUpdateCard(context, cardActions);
+        } else {
+            await this.sendWelcomeCard(context, cardActions);
+        }
+    }
+
+    async sendUpdateCard(context, cardActions) {
+        const data = context.activity.value;
+        data.count += 1;
+        cardActions.push({
+            type: ActionTypes.MessageBack,
+            title: 'Update Card',
+            value: data,
+            text: 'UpdateCardAction'
+        });
+        const card = CardFactory.heroCard(
+            'Updated card',
+            `Update count: ${ data.count }`,
+            null,
+            cardActions
+        );
+        card.id = context.activity.replyToId;
+        const message = MessageFactory.attachment(card);
+        message.id = context.activity.replyToId;
+        await context.updateActivity(message);
+    }
+
+    async sendWelcomeCard(context, cardActions) {
+        const initialValue = {
+            count: 0
+        };
+        cardActions.push({
+            type: ActionTypes.MessageBack,
+            title: 'Update Card',
+            value: initialValue,
+            text: 'UpdateCardAction'
+        });
+        const card = CardFactory.heroCard(
+            'Welcome card',
+            '',
+            null,
+            cardActions
+        );
+        await context.sendActivity(MessageFactory.attachment(card));
+    }
+
+    async startActivityAsync(context) {
+        context.sendActivity(MessageFactory.text('Meeting started!'));
+    }
+
+    async joinActivityAsync(context) {
+        context.sendActivity(MessageFactory.text('Meeting joined!'));
+
+    }
+
+    async helpActivityAsync(context) {
+        context.sendActivity(MessageFactory.text('Help found!'));
+
+    }
+
+    async logoutActivityAsync(context) {
+        context.sendActivity(MessageFactory.text('Lougout initiated.'));
+    }
+}
+
+const botBetter = new TeamsConversationBot();
+
 const server = restify.createServer();
 server.listen(3978, function () {
     console.log('%s listening to %s', server.name, util.inspect(server.address()));
