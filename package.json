@@ -4,6 +4,7 @@
   "description": "",
   "main": "app.js",
   "dependencies": {
+    "axios": "^0.19.2",
     "botbuilder": "^4.9.2",
     "botbuilder-teams": "^0.2.9",
     "request": "^2.88.2",

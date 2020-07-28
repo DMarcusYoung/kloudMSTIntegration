@@ -4,6 +4,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var util = require("util");
 var teams = require('botbuilder-teams');
+const axios = require('axios')
 
 const { BotFrameworkAdapter, TeamsActivityHandler, CardFactory } = require('botbuilder');
 const { title } = require('process');
@@ -40,6 +41,8 @@ class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
                 return startMeeting(context, action)
             case 'syncRoom':
                 return syncRoom(context, action)
+            case 'listDocs':
+                return listDocs(context, action)
             default: 
                 throw new Error('Not Implemented')
         }
@@ -99,6 +102,35 @@ function syncRoom(context, action){
           }
         }
       };
+}
+
+const listDocs = async (context, action) => {
+    const docList = await axios.get('https://api.peertime.cn/peertime/V1/SpaceAttachment/List?spaceID=370&type=0&pageIndex=0&pageSize=15', {
+        headers: {
+            UserToken: 'aa398b9f-65bc-4855-8fd3-c88aea9d6955'
+        }
+    })
+    console.log(docList.data);
+    const documentList = [
+        { name: 'Document 1', url: 'https://kloud.com' },
+        { name: 'Document 2', url: 'https://us.kloud.com/join' },
+        { name: 'Document 3', url: 'https://kloud.cn/docview/1980757' },
+    ]
+    const buttons = []
+    documentList.forEach(el => buttons.push({ type: 'openUrl', title: el.name, value: el.url }))
+    const heroCard = CardFactory.heroCard('Documents', '', [], buttons);
+    heroCard.content.subtitle = action.data.subTitle;
+    const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
+
+    return {
+        composeExtension: {
+            type: 'result',
+            attachmentLayout: 'list',
+            attachments: [
+            attachment
+            ]
+        }
+    }
 }
 
 const bot = new TeamsMessagingExtensionsActionBot();
