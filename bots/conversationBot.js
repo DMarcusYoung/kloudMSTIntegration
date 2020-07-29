@@ -117,7 +117,9 @@ class ConversationBot extends TeamsActivityHandler {
 
     async helpActivityAsync(context) {
         try {
-            context.sendActivity(MessageFactory.text('Help found!'));
+            context.sendActivity(MessageFactory.text('1. start - start a personal meeting \n' +
+            '2. join (meeting ID) - join a specific meeting\n' + 
+            '3. logout - logout of your account'));
         } catch (e) {
             console.log(e)
             return
