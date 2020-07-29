@@ -6,7 +6,7 @@ var util = require("util");
 var teams = require('botbuilder-teams');
 const axios = require('axios')
 
-const { BotFrameworkAdapter, TeamsActivityHandler, CardFactory } = require('botbuilder');
+const { BotFrameworkAdapter, TeamsActivityHandler, CardFactory, TurnContext, ActionTypes, MessageFactory } = require('botbuilder');
 const { title } = require('process');
 
 const adapter = new BotFrameworkAdapter({
@@ -39,8 +39,8 @@ class TeamsMessagingExtensionsActionBot extends TeamsActivityHandler {
         switch(action.commandId){
             case 'startMeeting':
                 return startMeeting(context, action)
-            case 'syncRoom':
-                return syncRoom(context, action)
+            case 'syncRooms':
+                return syncRooms(context, action)
             case 'listDocs':
                 return listDocs(context, action)
             default: 
@@ -70,7 +70,7 @@ function startMeeting(context, action){
     }
 }
 
-function syncRoom(context, action){
+function syncRooms(context, action){
     const syncRoomList = [
         { name: 'Room 1', url: 'https://kloud.com' },
         { name: 'Room 2', url: 'https://us.kloud.com/join' },
@@ -134,20 +134,6 @@ const listDocs = async (context, action) => {
 }
 
 const bot = new TeamsMessagingExtensionsActionBot();
-// const inMemoryStorage = new builder.MemoryBotStorage();
-// const chatBot = new builder.UniversalBot(adapter).set('storage', inMemoryStorage);
-
-// var stripBotAtMentions = new teams.StripBotAtMentions();
-// chatBot.use(stripBotAtMentions);
-
-// chatBot.dialog('/', [
-//     function (session) {
-//         builder.Prompts.text(session, 'Hi! What is your name?');
-//     },
-//     function (session, results) {
-//         session.endDialog(`Hello ${results.response}!`);
-//     }
-// ]);
 
 class TeamsConversationBot extends TeamsActivityHandler {
     constructor() {
@@ -253,7 +239,7 @@ class TeamsConversationBot extends TeamsActivityHandler {
     }
 
     async logoutActivityAsync(context) {
-        context.sendActivity(MessageFactory.text('Lougout initiated.'));
+        context.sendActivity(MessageFactory.text('Logout initiated.'));
     }
 }
 
@@ -267,5 +253,6 @@ server.listen(3978, function () {
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
         await bot.run(context);
+        await botBetter.run(context);
     });
 });
