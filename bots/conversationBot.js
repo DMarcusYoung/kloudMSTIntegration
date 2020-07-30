@@ -4,7 +4,7 @@ class ConversationBot extends TeamsActivityHandler {
 
     constructor() {
         super();
-        sendActivity(MessageFactory.text("Hewwo! I'm OwO bot"));
+        // sendActivity(MessageFactory.text("Hewwo! I'm OwO bot"));
         this.onMessage(async (context, next) => {
             TurnContext.removeRecipientMention(context.activity);
             const text = context.activity.text.trim().toLocaleLowerCase();
