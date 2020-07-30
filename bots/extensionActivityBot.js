@@ -1,7 +1,7 @@
 const { TeamsActivityHandler, CardFactory } = require('botbuilder');
 const axios = require ('axios');
 
-class ExtensionBot extends TeamsActivityHandler {
+class ExtensionActionBot extends TeamsActivityHandler {
     handleTeamsMessagingExtensionSubmitAction(context, action) {
         switch(action.commandId){
             case 'startMeeting':
@@ -24,13 +24,12 @@ class ExtensionBot extends TeamsActivityHandler {
             },]);
         heroCard.content.subtitle = data.subTitle;
         const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
-    
         return {
             composeExtension: {
                 type: 'result',
                 attachmentLayout: 'list',
                 attachments: [
-                attachment
+                    attachment
                 ]
             }
         }
@@ -70,24 +69,23 @@ class ExtensionBot extends TeamsActivityHandler {
                 UserToken: 'aa398b9f-65bc-4855-8fd3-c88aea9d6955'
             }
         })
-        console.log(docList.data);
-        const documentList = [
-            { name: 'Document 1', url: 'https://kloud.com' },
-            { name: 'Document 2', url: 'https://us.kloud.com/join' },
-            { name: 'Document 3', url: 'https://kloud.cn/docview/1980757' },
-        ]
+        const parsedDocs = JSON.parse(docList.data.substr(1)).RetData.DocumentList;
         const buttons = []
-        documentList.forEach(el => buttons.push({ type: 'openUrl', title: el.name, value: el.url }))
+        parsedDocs.forEach(el => buttons.push({ type: 'openUrl', title: el.Title, value: `https://kloud.cn/docview/${el.ItemID}` }))
+        buttons.push({ type: 'openUrl', title: 'My Doc', value: `https://kloud.cn/docview/1981415` })
         const heroCard = CardFactory.heroCard('Documents', '', [], buttons);
         heroCard.content.subtitle = action.data.subTitle;
         const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
+        const heroCard2 = CardFactory.heroCard('Another Card', '', []);
+        heroCard2.content.subtitle = action.data.subTitle;
+        const attachment2 = {contentType: heroCard2.contentType, content: heroCard2.content, preview: heroCard2 };
     
         return {
             composeExtension: {
                 type: 'result',
                 attachmentLayout: 'list',
                 attachments: [
-                attachment
+                    attachment
                 ]
             }
         }
@@ -95,4 +93,4 @@ class ExtensionBot extends TeamsActivityHandler {
 
 }
 
-module.exports.ExtensionBot = ExtensionBot;
+module.exports.ExtensionActionBot = ExtensionActionBot;
