@@ -5,7 +5,8 @@ const util = require("util");
 // const teams = require('botbuilder-teams');
 const { BotFrameworkAdapter } = require('botbuilder');
 // const { title } = require('process');
-const { ExtensionBot } = require('./bots/extensionBot');
+const { ExtensionSearchBot } = require('./bots/exensionSearchBot');
+const { ExtensionActionBot } = require('./bots/extensionActivityBot');
 const { ConversationBot } = require('./bots/conversationBot');
 
 
@@ -34,7 +35,8 @@ adapter.onTurnError = async (context, error) => {
     await context.sendActivity('To continue to run this bot, please fix the bot source code.');
 };  
 
-const extensionBot = new ExtensionBot();
+const extensionActionBot = new ExtensionActionBot();
+const extensionSearchBot = new ExtensionSearchBot();
 const conversationBot = new ConversationBot();
 
 const server = restify.createServer();
@@ -44,7 +46,8 @@ server.listen(3978, function () {
 
 server.post('/api/messages', (req, res) => {
     adapter.processActivity(req, res, async (context) => {
-        await extensionBot.run(context);
+        await extensionActionBot.run(context);
+        await extensionSearchBot.run(context);
         await conversationBot.run(context);
     });
 });
