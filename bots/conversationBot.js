@@ -4,10 +4,10 @@ class ConversationBot extends TeamsActivityHandler {
 
     constructor() {
         super();
-        var msg = new builder.Message().address(address);
-        msg.text("Hewwo! I'm OwO bot");
-        bot.send(msg);
-        this.onDialog(async (context, next) => {
+        // var msg = new builder.Message().address(address);
+        // msg.text("Hewwo! I'm OwO bot");
+        // bot.send(msg);
+        this.onTypingActivity(async (context, next) => {
             context.sendActivity(MessageFactory.text("Hewwo! I'm OwO bot"));
         });
         this.onMessage(async (context, next) => {

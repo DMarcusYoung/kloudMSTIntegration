@@ -7,9 +7,10 @@ class ExtensionActionBot extends TeamsActivityHandler {
             case 'startMeeting':
                 return this.startMeeting(context, action)
             case 'syncRooms':
-                return this.syncRooms(context, action)
+                return this.syncRooms()
             case 'listDocs':
-                return this.listDocs(context, action)
+                if(action.data.id) return this.listDocs()
+                else return this.createHeroCard(context, action)
             default: 
                 throw new Error('Not Implemented')
         }
@@ -22,7 +23,6 @@ class ExtensionActionBot extends TeamsActivityHandler {
             "title": "Start Meeting",
             "value": "kloud.cn/kloud/documents"
             },]);
-        heroCard.content.subtitle = data.subTitle;
         const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
         return {
             composeExtension: {
@@ -49,7 +49,7 @@ class ExtensionActionBot extends TeamsActivityHandler {
             version: '1.0'
           });
     
-          return {
+        return {
             task: {
               type: 'continue',
               value: {
@@ -60,26 +60,83 @@ class ExtensionActionBot extends TeamsActivityHandler {
                 width: 500
               }
             }
-          };
+        };
     }
 
-    listDocs = async (context, action) => {
+    listDocs = async () => {
         const docList = await axios.get('https://api.peertime.cn/peertime/V1/SpaceAttachment/List?spaceID=370&type=0&pageIndex=0&pageSize=15', {
             headers: {
                 UserToken: 'aa398b9f-65bc-4855-8fd3-c88aea9d6955'
             }
         })
         const parsedDocs = JSON.parse(docList.data.substr(1)).RetData.DocumentList;
-        const buttons = []
-        parsedDocs.forEach(el => buttons.push({ type: 'openUrl', title: el.Title, value: `https://kloud.cn/docview/${el.ItemID}` }))
-        buttons.push({ type: 'openUrl', title: 'My Doc', value: `https://kloud.cn/docview/1981415` })
-        const heroCard = CardFactory.heroCard('Documents', '', [], buttons);
-        heroCard.content.subtitle = action.data.subTitle;
-        const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
-        const heroCard2 = CardFactory.heroCard('Another Card', '', []);
-        heroCard2.content.subtitle = action.data.subTitle;
-        const attachment2 = {contentType: heroCard2.contentType, content: heroCard2.content, preview: heroCard2 };
+        const choices = [];
+        // console.log(parsedDocs[0])
+        parsedDocs.forEach(el => choices.push({title: el.Title, value: `${el.Title}https://kloud.cn/docview/${el.ItemID}`}))
+        const adaptiveCard = CardFactory.adaptiveCard({
+            body:[
+                {
+                    type: "TextBlock",
+                    text: "Select a Document and Press Open"
+                 },
+                {
+                    type: "Input.ChoiceSet",
+                    id: "SingleSelectVal",
+                    style: "expanded",
+                    value: "1",
+                    choices
+                },
+            ],
+            actions:[
+                {
+                    title: 'Open',
+                    type: 'Action.Submit',
+                    url: 'kloud.com'
+                }
+            ],
+            type: 'AdaptiveCard',
+            version: '1.0'
+          });
+        
+        // const buttons = []
+        // parsedDocs.forEach(el => buttons.push({ type: 'openUrl', title: el.Title, value: `https://kloud.cn/docview/${el.ItemID}` }))
+        // const heroCard = CardFactory.heroCard('Documents', '', [], buttons);
+        // const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
+        // const heroCard2 = CardFactory.heroCard('Another Card', '', []);
+        // const attachment2 = {contentType: heroCard2.contentType, content: heroCard2.content, preview: heroCard2 };
     
+        return {
+            // composeExtension: {
+            //     type: 'result',
+            //     attachmentLayout: 'list',
+            //     attachments: [
+            //         attachment
+            //     ]
+            // }
+            task: {
+                type: 'continue',
+                value: {
+                  card: adaptiveCard,
+                  height: 450,
+                  title: 'Document List',
+                  url: null,
+                  width: 500
+                }
+            }
+            
+        }
+    }
+
+    createHeroCard = (context, action) => {
+        const data = action.data.SingleSelectVal
+        const title = data.slice(0, data.indexOf('https'))
+        const url = data.slice(data.indexOf('https'))
+        const heroCard = CardFactory.heroCard(`Doc Name: ${title}`, '', [], [{
+            "type": "openUrl",
+            "title": "Open Document",
+            "value": url
+            },]);
+        const attachment = { contentType: heroCard.contentType, content: heroCard.content, preview: heroCard };
         return {
             composeExtension: {
                 type: 'result',
@@ -90,7 +147,6 @@ class ExtensionActionBot extends TeamsActivityHandler {
             }
         }
     }
-
 }
 
 module.exports.ExtensionActionBot = ExtensionActionBot;
